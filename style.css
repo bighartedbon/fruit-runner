@@ -1,0 +1,390 @@
+/* ---------- Page ---------- */
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: #16242b;
+  color: #e9e2cf;
+  font-family: "Lucida Console", "Courier New", monospace;
+}
+
+/* ---------- Canvas frame ---------- */
+.frame {
+  position: relative;                 /* lets the HUD be positioned inside it */
+  width: min(92vmin, 720px);          /* square, scales down on small screens */
+  aspect-ratio: 1 / 1;
+  padding: 8px;
+  background: #e9e2cf;
+  border-radius: 6px;
+  box-shadow: 0 0 0 4px #0d161a, 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #9fd3e6;                /* fallback; main.js paints the sky */
+  border-radius: 2px;
+  image-rendering: pixelated;
+}
+
+/* ---------- HUD (top-left) ---------- */
+.hud {
+  position: absolute;
+  top: 20px;
+  left: 22px;
+  min-width: 112px;
+  font-size: clamp(12px, 2.5vmin, 18px);
+  font-weight: bold;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  color: #10222a;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+  pointer-events: none;
+  background: rgba(233, 226, 207, 0.25);
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.audio-toggle {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  width: 42px;
+  height: 42px;
+  border: 2px solid rgba(16, 34, 42, 0.9);
+  border-radius: 50%;
+  background: rgba(16, 34, 42, 0.82);
+  color: #e9e2cf;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 4;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+.audio-toggle:hover {
+  transform: translateY(-1px);
+}
+
+.audio-toggle:focus-visible {
+  outline: 3px solid #f2b632;
+  outline-offset: 2px;
+}
+
+.audio-toggle:active {
+  transform: translateY(0);
+}
+
+.boss-health {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 5px;
+  padding: 3px 6px;
+  border: 1px solid #7d2d32;
+  background: rgba(233, 226, 207, 0.9);
+  color: #7d2d32;
+  white-space: nowrap;
+}
+
+.boss-health[hidden] {
+  display: none;
+}
+
+.boss-health progress {
+  width: 70px;
+  height: 10px;
+  accent-color: #7d2d32;
+}
+
+.overlay {
+  position: absolute;
+  inset: 8px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, rgba(12, 32, 39, 0.78), rgba(24, 53, 45, 0.76));
+  backdrop-filter: blur(3px);
+  border-radius: 2px;
+  padding: 20px;
+  z-index: 2;
+}
+
+.overlay.visible {
+  display: flex;
+}
+
+.overlay-card {
+  width: min(100%, 500px);
+  background: rgba(233, 226, 207, 0.96);
+  color: #10222a;
+  border: 4px solid #10222a;
+  padding: clamp(22px, 5vmin, 42px);
+  text-align: center;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.23);
+}
+
+.overlay[data-state="START_MENU"] {
+  background:
+    radial-gradient(ellipse at 50% 20%, rgba(242, 182, 50, 0.22), transparent 55%),
+    linear-gradient(145deg, rgba(12, 32, 39, 0.84), rgba(24, 53, 45, 0.82));
+}
+
+.overlay[data-state]:not([data-state="START_MENU"]) .eyebrow,
+.overlay[data-state]:not([data-state="START_MENU"]) .controls-guide,
+.overlay[data-state]:not([data-state="START_MENU"]) .start-prompt,
+.overlay[data-state]:not([data-state="START_MENU"]) .save-summary,
+.overlay[data-state]:not([data-state="START_MENU"]) .level-select,
+.overlay[data-state]:not([data-state="START_MENU"]) #reset-save-progress {
+  display: none;
+}
+
+.overlay[data-state]:not([data-state="START_MENU"]) #overlay-message {
+  display: block;
+  margin: 0;
+  color: inherit;
+  font-size: clamp(12px, 2.1vmin, 18px);
+  font-weight: normal;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.overlay[data-state="GAME_OVER"] {
+  background: rgba(44, 14, 18, 0.72);
+}
+
+.overlay[data-state="GAME_OVER"] .overlay-card {
+  border-color: #8f2937;
+}
+
+.overlay[data-state="GAME_OVER"] #overlay-button {
+  border-color: #8f2937;
+  background: #8f2937;
+}
+
+.overlay[data-state="VICTORY"] {
+  background: rgba(9, 49, 39, 0.72);
+}
+
+.overlay[data-state="VICTORY"] .overlay-card {
+  border-color: #26734f;
+}
+
+.overlay[data-state="VICTORY"] #overlay-button {
+  border-color: #26734f;
+  background: #26734f;
+}
+
+.overlay-card h1 {
+  margin: 0 0 18px;
+  font-size: clamp(34px, 7vmin, 62px);
+  line-height: 0.9;
+  letter-spacing: 0.08em;
+  color: #8f2937;
+  text-transform: uppercase;
+  text-shadow: 3px 4px 0 #f2b632;
+  font-family: Impact, "Arial Black", sans-serif;
+}
+
+.overlay-card p {
+  margin: 0;
+  font-size: clamp(12px, 2.1vmin, 18px);
+}
+
+.eyebrow {
+  margin-bottom: 12px !important;
+  color: #5c6670;
+  font-size: clamp(10px, 1.7vmin, 14px) !important;
+  font-weight: bold;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.controls-guide {
+  display: grid;
+  gap: 10px;
+  margin: 0 auto;
+  max-width: 420px;
+  line-height: 1.5;
+}
+
+.save-summary {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 0 auto 12px;
+  color: #5c6670;
+  font-size: 12px;
+}
+
+.save-summary strong {
+  color: #8f2937;
+}
+
+.level-select {
+  margin: 16px auto 0;
+  max-width: 380px;
+}
+
+.level-select h2 {
+  margin: 0 0 8px;
+  color: #5c6670;
+  font-size: 12px;
+}
+
+.level-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.level-select-item {
+  display: grid;
+  min-width: 0;
+  min-height: 48px;
+  align-content: center;
+  justify-items: center;
+  gap: 2px;
+  border: 2px solid #10222a;
+  background: #fff9e9;
+  color: #10222a;
+  font: inherit;
+  cursor: pointer;
+}
+
+.level-select-item:not(:disabled):hover {
+  background: #f2b632;
+}
+
+.level-select-item:disabled {
+  border-color: #a5a9a5;
+  background: #d9ddd6;
+  color: #68716d;
+  cursor: not-allowed;
+}
+
+.level-number {
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.level-stars {
+  min-height: 12px;
+  color: #a15b20;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.level-select-item:disabled .level-stars {
+  color: #68716d;
+  font-size: 7px;
+}
+
+.controls-guide p {
+  font-size: clamp(12px, 2vmin, 16px);
+}
+
+.start-prompt {
+  margin-top: 24px !important;
+  color: #5c6670;
+  font-size: clamp(10px, 1.8vmin, 14px) !important;
+  font-weight: bold;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+#overlay-button {
+  margin-top: 16px;
+  padding: 12px 24px;
+  border: 2px solid #10222a;
+  background: #10222a;
+  color: #e9e2cf;
+  font: inherit;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.reset-save-button {
+  display: block;
+  margin: 12px auto 0;
+  padding: 6px 10px;
+  border: 1px solid #8f2937;
+  background: transparent;
+  color: #8f2937;
+  font: inherit;
+  font-size: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.reset-save-button:hover {
+  background: #f6e3e2;
+}
+
+#overlay-button:hover {
+  transform: translateY(-1px);
+}
+
+#overlay-button:active {
+  transform: translateY(0);
+}
+
+.hint {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+@media (max-width: 520px) {
+  .overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    overflow-y: auto;
+    padding: 12px;
+  }
+
+  .overlay-card {
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+  }
+
+  .audio-toggle {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 6;
+  }
+}
+
+@media (max-height: 520px) {
+  body {
+    gap: 8px;
+  }
+
+  .overlay-card {
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 14px 20px;
+  }
+
+  .controls-guide {
+    gap: 5px;
+  }
+
+  .start-prompt {
+    margin-top: 12px !important;
+  }
+}

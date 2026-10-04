@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fruit Runner</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="frame">
+    <canvas id="game" width="720" height="720" aria-label="Game canvas"></canvas>
+
+    <div id="overlay" class="overlay visible" data-state="START_MENU" role="dialog" aria-modal="true" aria-labelledby="overlay-title" aria-describedby="overlay-message">
+      <div class="overlay-card start-card">
+        <p class="eyebrow">A fruity little platform adventure</p>
+        <h1 id="overlay-title">FRUIT RUNNER</h1>
+        <div class="save-summary" aria-label="Saved progress">
+          <p>High Score <strong id="start-high-score">0</strong></p>
+          <p>Fruit Collected <strong id="start-fruit-total">0</strong></p>
+        </div>
+        <div class="controls-guide">
+          <p>Move: A / D or Left / Right Arrows</p>
+          <p>Jump: W, Up Arrow, or Space</p>
+          <p>Stomp enemies from above to defeat them!</p>
+          <p>Collect Fruits (+5) and Cherries (+10) to reach target scores!</p>
+        </div>
+        <section class="level-select" aria-labelledby="level-select-title">
+          <h2 id="level-select-title">SELECT LEVEL</h2>
+          <div id="level-select-grid" class="level-grid"></div>
+        </section>
+        <p id="overlay-message" class="start-prompt">Press SPACE or Click 'START GAME' to Play</p>
+        <button id="overlay-button" type="button">START GAME</button>
+        <button id="reset-save-progress" class="reset-save-button" type="button">RESET SAVE PROGRESS</button>
+      </div>
+    </div>
+
+    <div class="hud" aria-live="polite">
+      <div>Lvl <span id="hud-level">1</span></div>
+      <div>Score <span id="hud-score">0</span></div>
+      <div>Best <span id="hud-best-score">0</span></div>
+      <div>Lives <span id="hud-lives">3</span></div>
+      <div id="hud-boss-health" class="boss-health" hidden>
+        <span>Boss</span>
+        <progress id="boss-health-bar" max="5" value="5"></progress>
+        <span id="boss-health-text">5/5</span>
+      </div>
+    </div>
+
+    <button id="audio-toggle" class="audio-toggle" type="button" aria-label="Mute sound" title="Mute sound">🔊</button>
+  </main>
+
+  <p class="hint">Move: &larr; &rarr; / A D &nbsp;|&nbsp; Hold jump: &uarr; / W / Space</p>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
